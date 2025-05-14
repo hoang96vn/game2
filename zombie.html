@@ -46,6 +46,7 @@
     let frame = 0;
 
     let sun = 200; // Sunlight counter
+    let selectedPlant = 'peashooter';
 
     class Plant {
       constructor(x, y) {
@@ -58,6 +59,29 @@
       draw() {
         ctx.fillStyle = 'green';
         ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+      update() {}
+    }
+
+    class Sunflower extends Plant {
+      constructor(x, y) {
+        super(x, y);
+        this.sunTimer = 0;
+        this.sunInterval = 600; // frames to generate sun
+      }
+      update() {
+        this.sunTimer++;
+        if (this.sunTimer >= this.sunInterval) {
+          sun += 25;
+          updateSunDisplay();
+          this.sunTimer = 0;
+        }
+      }
+      draw() {
+        ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(this.x + this.width/2, this.y + this.height/2, this.width/2 - 10, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
@@ -88,14 +112,26 @@
       const x = Math.floor((e.clientX - rect.left) / cellSize) * cellSize;
       const y = Math.floor((e.clientY - rect.top) / cellSize) * cellSize;
 
-      // Check if enough sun to plant
-      const sunCost = 100;
       const occupied = plants.some(p => p.x === x && p.y === y);
+      const sunCost = selectedPlant === 'sunflower' ? 50 : 100;
 
       if (sun >= sunCost && !occupied) {
-        plants.push(new Plant(x, y));
+        if (selectedPlant === 'sunflower') {
+          plants.push(new Sunflower(x, y));
+        } else {
+          plants.push(new Plant(x, y));
+        }
         sun -= sunCost;
         updateSunDisplay();
+      }
+    });
+
+    // Switch plant type by key
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 's') {
+        selectedPlant = 'sunflower';
+      } else if (e.key.toLowerCase() === 'p') {
+        selectedPlant = 'peashooter';
       }
     });
 
@@ -126,6 +162,7 @@
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < plants.length; i++) {
+        plants[i].update();
         plants[i].draw();
       }
       for (let i = 0; i < zombies.length; i++) {
