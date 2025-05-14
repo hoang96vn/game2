@@ -4,16 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plants vs Zombies Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      background: #d0e7b1;
-      font-family: sans-serif;
+      font-family: 'Fredoka', sans-serif;
+      background: url('https://i.imgur.com/ZV8cZpF.jpg') no-repeat center center fixed;
+      background-size: cover;
     }
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background: #7ac142;
+    #menu {
+      text-align: center;
+      padding-top: 100px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    select, button {
+      font-size: 20px;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #startButton {
+      background: orange;
+      color: white;
+      font-weight: bold;
     }
     #sunDisplay {
       position: absolute;
@@ -23,15 +43,34 @@
       padding: 8px 12px;
       border-radius: 8px;
       font-weight: bold;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+    canvas {
+      display: none;
+      margin: 20px auto;
+      background: #7ac142;
+      border: 4px solid #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
+  <div id="menu">
+    <h1>🌻 Plants vs Zombies</h1>
+    <select id="levelSelect">
+      <option value="1">Màn 1</option>
+      <option value="2">Màn 2</option>
+    </select>
+    <br>
+    <button id="startButton">Bắt đầu</button>
+  </div>
+
   <div id="sunDisplay">☀️ Sun: 200</div>
   <canvas id="gameCanvas" width="800" height="480"></canvas>
 
   <script>
+    const menu = document.getElementById('menu');
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const sunDisplay = document.getElementById('sunDisplay');
@@ -48,13 +87,12 @@
     let sun = 200;
     let selectedPlant = 'peashooter';
 
-    // Load images
     const peashooterImg = new Image();
-    peashooterImg.src = '/mnt/data/587ad563-d616-43de-abe4-5502cede4b89.png';
+    peashooterImg.src = 'https://hoang96vn.github.io/game2/peashoter.png';
     const sunflowerImg = new Image();
-    sunflowerImg.src = '/mnt/data/587ad563-d616-43de-abe4-5502cede4b89.png';
+    sunflowerImg.src = 'https://hoang96vn.github.io/game2/sunflower.png';
     const zombieImg = new Image();
-    zombieImg.src = '/mnt/data/7a68fb1a-637a-4566-84eb-da17592d3be0.png';
+    zombieImg.src = 'https://hoang96vn.github.io/game2/zombie.png';
 
     class Plant {
       constructor(x, y) {
@@ -226,8 +264,13 @@
       requestAnimationFrame(animate);
     }
 
-    updateSunDisplay();
-    animate();
+    document.getElementById('startButton').addEventListener('click', () => {
+      menu.style.display = 'none';
+      canvas.style.display = 'block';
+      sunDisplay.style.display = 'block';
+      updateSunDisplay();
+      animate();
+    });
   </script>
 </body>
 </html>
