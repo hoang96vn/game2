@@ -68,7 +68,7 @@
 
   <div id="sunDisplay">☀️ Sun: 200</div>
   <canvas id="gameCanvas" width="800" height="480"></canvas>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script>
     const menu = document.getElementById('menu');
     const canvas = document.getElementById('gameCanvas');
@@ -271,6 +271,73 @@
       updateSunDisplay();
       animate();
     });
+    class Bullet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.width = 10;
+    this.height = 10;
+    this.damage = 20;
+    this.element = document.createElement('div');
+    this.element.style.position = 'absolute';
+    this.element.style.width = '10px';
+    this.element.style.height = '10px';
+    this.element.style.background = 'black';
+    this.element.style.top = `${y}px`;
+    this.element.style.left = `${x}px`;
+    document.body.appendChild(this.element);
+  }
+  update() {
+    gsap.to(this.element, { x: "+=300", duration: 1, onComplete: () => document.body.removeChild(this.element) });
+  }
+}
+    const shootSound = new Audio('https://hoang96vn.github.io/game2/shoot.mp3');
+
+class Bullet {
+  constructor(x, y) {
+    shootSound.play(); // Chạy âm thanh khi đạn được tạo
+    this.x = x;
+    this.y = y;
+    this.width = 10;
+    this.height = 10;
+    this.speed = 3;
+    this.damage = 20;
+  }
+}
+    const zombieDeathSound = new Audio('https://hoang96vn.github.io/game2/zombie-death.mp3');
+
+function handleCollisions() {
+  for (let j = zombies.length - 1; j >= 0; j--) {
+    if (zombies[j].health <= 0) {
+      zombieDeathSound.play(); // Chạy âm thanh khi zombie bị tiêu diệt
+      zombies.splice(j, 1);
+    }
+  }
+}
+    function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  plants.forEach(plant => {
+    plant.update();
+    plant.draw();
+  });
+
+  bullets.forEach(bullet => {
+    bullet.update();
+    bullet.draw();
+  });
+
+  zombies.forEach(zombie => {
+    zombie.update();
+    zombie.draw();
+  });
+
+  handleCollisions();
+
+  if (frame % 300 === 0) spawnZombie();
+  frame++;
+  requestAnimationFrame(animate);
+}
   </script>
 </body>
 </html>
