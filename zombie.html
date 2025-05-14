@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plants vs Zombies Web</title>
+  <style>
+    body {
+      margin: 0;
+      background: #d0e7b1;
+      font-family: sans-serif;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: #7ac142;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Game settings
+    const cellSize = 80;
+    const rows = 5;
+    const cols = 9;
+
+    const plants = [];
+    const zombies = [];
+    let frame = 0;
+
+    class Plant {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = cellSize;
+        this.height = cellSize;
+        this.health = 100;
+      }
+      draw() {
+        ctx.fillStyle = 'green';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+    }
+
+    class Zombie {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = cellSize;
+        this.height = cellSize;
+        this.health = 100;
+        this.speed = 0.5;
+      }
+      update() {
+        this.x -= this.speed;
+      }
+      draw() {
+        ctx.fillStyle = 'gray';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+    }
+
+    canvas.addEventListener('click', function (e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((e.clientX - rect.left) / cellSize) * cellSize;
+      const y = Math.floor((e.clientY - rect.top) / cellSize) * cellSize;
+      plants.push(new Plant(x, y));
+    });
+
+    function spawnZombie() {
+      const row = Math.floor(Math.random() * rows);
+      zombies.push(new Zombie(canvas.width, row * cellSize));
+    }
+
+    function handleCollisions() {
+      for (let i = 0; i < zombies.length; i++) {
+        for (let j = 0; j < plants.length; j++) {
+          if (
+            zombies[i].x < plants[j].x + plants[j].width &&
+            zombies[i].x + zombies[i].width > plants[j].x &&
+            zombies[i].y === plants[j].y
+          ) {
+            zombies[i].speed = 0;
+            plants[j].health -= 0.5;
+            if (plants[j].health <= 0) {
+              plants.splice(j, 1);
+              zombies[i].speed = 0.5;
+            }
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < plants.length; i++) {
+        plants[i].draw();
+      }
+      for (let i = 0; i < zombies.length; i++) {
+        zombies[i].update();
+        zombies[i].draw();
+      }
+      handleCollisions();
+      if (frame % 300 === 0) spawnZombie();
+      frame++;
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
