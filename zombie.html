@@ -115,24 +115,33 @@
       }
     }
 
-    class Sunflower extends Plant {
-      constructor(x, y) {
-        super(x, y);
-        this.sunTimer = 0;
-      }
-      update() {
-        this.sunTimer++;
-        if (this.sunTimer >= 600) {
-          sun += 25;
-          updateSunDisplay();
-          this.sunTimer = 0;
-        }
-      }
-      draw() {
-        ctx.drawImage(sunflowerImg, this.x, this.y, this.width, this.height);
-      }
+  class Sunflower extends Plant {
+  constructor(x, y) {
+    super(x, y);
+    this.sunTimer = 0;
+    this.sunList = [];
+  }
+  update() {
+    this.sunTimer++;
+    if (this.sunTimer >= 600) {
+      const sunX = this.x + Math.floor(Math.random() * 40);
+      const sunY = this.y + Math.floor(Math.random() * 40);
+      this.sunList.push({ x: sunX, y: sunY });
+      this.sunTimer = 0;
     }
-
+  }
+  draw() {
+    ctx.drawImage(sunflowerImg, this.x, this.y, this.width, this.height);
+    
+    // Vẽ từng sun ra màn hình
+    this.sunList.forEach(sun => {
+      ctx.fillStyle = "yellow";
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+}
     class Bullet {
       constructor(x, y) {
         this.x = x;
@@ -370,14 +379,15 @@ function handleCollisions() {
 
   plants.forEach(plant => {
     if (plant instanceof Sunflower) {
-      plant.sunList.forEach((sun, index) => {
+      for (let i = plant.sunList.length - 1; i >= 0; i--) {
+        const sun = plant.sunList[i];
         const distance = Math.sqrt((clickX - sun.x) ** 2 + (clickY - sun.y) ** 2);
         if (distance < 15) {
-          sunList.splice(index, 1);
+          plant.sunList.splice(i, 1); // Xóa sun khi người chơi click
           sun += 25;
           updateSunDisplay();
         }
-      });
+      }
     }
   });
 });
