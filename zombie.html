@@ -36,16 +36,16 @@
     const ctx = canvas.getContext('2d');
     const sunDisplay = document.getElementById('sunDisplay');
 
-    // Game settings
     const cellSize = 80;
     const rows = 5;
     const cols = 9;
 
     const plants = [];
     const zombies = [];
+    const bullets = [];
     let frame = 0;
 
-    let sun = 200; // Sunlight counter
+    let sun = 200;
     let selectedPlant = 'peashooter';
 
     class Plant {
@@ -55,23 +55,29 @@
         this.width = cellSize;
         this.height = cellSize;
         this.health = 100;
+        this.shootTimer = 0;
+      }
+      update() {
+        this.shootTimer++;
+        if (this.shootTimer >= 100) {
+          bullets.push(new Bullet(this.x + this.width - 10, this.y + this.height / 2 - 5));
+          this.shootTimer = 0;
+        }
       }
       draw() {
         ctx.fillStyle = 'green';
         ctx.fillRect(this.x, this.y, this.width, this.height);
       }
-      update() {}
     }
 
     class Sunflower extends Plant {
       constructor(x, y) {
         super(x, y);
         this.sunTimer = 0;
-        this.sunInterval = 600; // frames to generate sun
       }
       update() {
         this.sunTimer++;
-        if (this.sunTimer >= this.sunInterval) {
+        if (this.sunTimer >= 600) {
           sun += 25;
           updateSunDisplay();
           this.sunTimer = 0;
@@ -80,8 +86,26 @@
       draw() {
         ctx.fillStyle = 'orange';
         ctx.beginPath();
-        ctx.arc(this.x + this.width/2, this.y + this.height/2, this.width/2 - 10, 0, Math.PI * 2);
+        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2 - 10, 0, Math.PI * 2);
         ctx.fill();
+      }
+    }
+
+    class Bullet {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 10;
+        this.height = 10;
+        this.speed = 3;
+        this.damage = 20;
+      }
+      update() {
+        this.x += this.speed;
+      }
+      draw() {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
       }
     }
 
@@ -126,7 +150,6 @@
       }
     });
 
-    // Switch plant type by key
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 's') {
         selectedPlant = 'sunflower';
@@ -141,6 +164,7 @@
     }
 
     function handleCollisions() {
+      // Zombie vs plant
       for (let i = 0; i < zombies.length; i++) {
         for (let j = 0; j < plants.length; j++) {
           if (
@@ -157,18 +181,44 @@
           }
         }
       }
+
+      // Bullet vs zombie
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        for (let j = zombies.length - 1; j >= 0; j--) {
+          if (
+            bullets[i].x < zombies[j].x + zombies[j].width &&
+            bullets[i].x + bullets[i].width > zombies[j].x &&
+            bullets[i].y > zombies[j].y &&
+            bullets[i].y < zombies[j].y + zombies[j].height
+          ) {
+            zombies[j].health -= bullets[i].damage;
+            bullets.splice(i, 1);
+            if (zombies[j].health <= 0) {
+              zombies.splice(j, 1);
+            }
+            break;
+          }
+        }
+      }
     }
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       for (let i = 0; i < plants.length; i++) {
         plants[i].update();
         plants[i].draw();
+      }
+      for (let i = 0; i < bullets.length; i++) {
+        bullets[i].update();
+        bullets[i].draw();
+        if (bullets[i].x > canvas.width) bullets.splice(i, 1);
       }
       for (let i = 0; i < zombies.length; i++) {
         zombies[i].update();
         zombies[i].draw();
       }
+
       handleCollisions();
       if (frame % 300 === 0) spawnZombie();
       frame++;
