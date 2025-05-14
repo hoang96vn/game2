@@ -15,14 +15,26 @@
       margin: 0 auto;
       background: #7ac142;
     }
+    #sunDisplay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: yellow;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 <body>
+  <div id="sunDisplay">☀️ Sun: 200</div>
   <canvas id="gameCanvas" width="800" height="480"></canvas>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const sunDisplay = document.getElementById('sunDisplay');
 
     // Game settings
     const cellSize = 80;
@@ -32,6 +44,8 @@
     const plants = [];
     const zombies = [];
     let frame = 0;
+
+    let sun = 200; // Sunlight counter
 
     class Plant {
       constructor(x, y) {
@@ -65,11 +79,24 @@
       }
     }
 
+    function updateSunDisplay() {
+      sunDisplay.textContent = `☀️ Sun: ${sun}`;
+    }
+
     canvas.addEventListener('click', function (e) {
       const rect = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - rect.left) / cellSize) * cellSize;
       const y = Math.floor((e.clientY - rect.top) / cellSize) * cellSize;
-      plants.push(new Plant(x, y));
+
+      // Check if enough sun to plant
+      const sunCost = 100;
+      const occupied = plants.some(p => p.x === x && p.y === y);
+
+      if (sun >= sunCost && !occupied) {
+        plants.push(new Plant(x, y));
+        sun -= sunCost;
+        updateSunDisplay();
+      }
     });
 
     function spawnZombie() {
@@ -111,6 +138,7 @@
       requestAnimationFrame(animate);
     }
 
+    updateSunDisplay();
     animate();
   </script>
 </body>
