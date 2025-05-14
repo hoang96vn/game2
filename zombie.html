@@ -48,6 +48,14 @@
     let sun = 200;
     let selectedPlant = 'peashooter';
 
+    // Load images
+    const peashooterImg = new Image();
+    peashooterImg.src = '/mnt/data/587ad563-d616-43de-abe4-5502cede4b89.png';
+    const sunflowerImg = new Image();
+    sunflowerImg.src = '/mnt/data/587ad563-d616-43de-abe4-5502cede4b89.png';
+    const zombieImg = new Image();
+    zombieImg.src = '/mnt/data/7a68fb1a-637a-4566-84eb-da17592d3be0.png';
+
     class Plant {
       constructor(x, y) {
         this.x = x;
@@ -65,8 +73,7 @@
         }
       }
       draw() {
-        ctx.fillStyle = 'green';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(peashooterImg, this.x, this.y, this.width, this.height);
       }
     }
 
@@ -84,10 +91,7 @@
         }
       }
       draw() {
-        ctx.fillStyle = 'orange';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2 - 10, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.drawImage(sunflowerImg, this.x, this.y, this.width, this.height);
       }
     }
 
@@ -122,8 +126,7 @@
         this.x -= this.speed;
       }
       draw() {
-        ctx.fillStyle = 'gray';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(zombieImg, this.x, this.y, this.width, this.height);
       }
     }
 
@@ -164,7 +167,6 @@
     }
 
     function handleCollisions() {
-      // Zombie vs plant
       for (let i = 0; i < zombies.length; i++) {
         for (let j = 0; j < plants.length; j++) {
           if (
@@ -182,7 +184,6 @@
         }
       }
 
-      // Bullet vs zombie
       for (let i = bullets.length - 1; i >= 0; i--) {
         for (let j = zombies.length - 1; j >= 0; j--) {
           if (
