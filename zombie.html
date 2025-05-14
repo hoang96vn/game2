@@ -338,6 +338,52 @@ function handleCollisions() {
   frame++;
   requestAnimationFrame(animate);
 }
+    class Sunflower extends Plant {
+  constructor(x, y) {
+    super(x, y);
+    this.sunTimer = 0;
+    this.sunList = [];
+  }
+  update() {
+    this.sunTimer++;
+    if (this.sunTimer >= 600) {
+      const sunX = this.x + Math.floor(Math.random() * 40);
+      const sunY = this.y + Math.floor(Math.random() * 40);
+      this.sunList.push({ x: sunX, y: sunY });
+      this.sunTimer = 0;
+    }
+  }
+  draw() {
+    ctx.drawImage(sunflowerImg, this.x, this.y, this.width, this.height);
+    this.sunList.forEach(sun => {
+      ctx.fillStyle = "yellow";
+      ctx.beginPath();
+      ctx.arc(sun.x, sun.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+}
+    canvas.addEventListener("click", function (e) {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  plants.forEach(plant => {
+    if (plant instanceof Sunflower) {
+      plant.sunList.forEach((sun, index) => {
+        const distance = Math.sqrt((clickX - sun.x) ** 2 + (clickY - sun.y) ** 2);
+        if (distance < 15) {
+          sunList.splice(index, 1);
+          sun += 25;
+          updateSunDisplay();
+        }
+      });
+    }
+  });
+});
+    function updateSunDisplay() {
+  sunDisplay.textContent = `☀️ Sun: ${sun}`;
+}
   </script>
 </body>
 </html>
