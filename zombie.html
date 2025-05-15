@@ -53,6 +53,27 @@
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
+    #plantSelector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.plant-icon {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, border 0.2s;
+}
+
+.plant-icon:hover {
+  transform: scale(1.1);
+}
+
+.plant-icon.selected {
+  border: 3px solid gold;
+  box-shadow: 0 0 10px yellow;
+}
   </style>
 </head>
 <body>
@@ -68,6 +89,12 @@
 
   <div id="sunDisplay">☀️ Sun: 200</div>
   <canvas id="gameCanvas" width="800" height="480"></canvas>
+  <div id="plantSelector" style="display: none; margin-top: 10px;">
+  <img src="https://hoang96vn.github.io/game2/peashooter.png" alt="Peashooter"
+    class="plant-icon selected" data-plant="peashooter" width="60" height="60">
+  <img src="https://hoang96vn.github.io/game2/sunflower.png" alt="Sunflower"
+    class="plant-icon" data-plant="sunflower" width="60" height="60">
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
  <script>
   const menu = document.getElementById('menu');
@@ -264,13 +291,14 @@
     requestAnimationFrame(animate);
   }
 
-  document.getElementById('startButton').addEventListener('click', () => {
-    menu.style.display = 'none';
-    canvas.style.display = 'block';
-    sunDisplay.style.display = 'block';
-    updateSunDisplay();
-    animate();
-  });
+ document.getElementById('startButton').addEventListener('click', () => {
+  menu.style.display = 'none';
+  canvas.style.display = 'block';
+  sunDisplay.style.display = 'block';
+  document.getElementById('plantSelector').style.display = 'flex'; // Thêm dòng này
+  updateSunDisplay();
+  animate();
+});
 
   canvas.addEventListener('click', function (e) {
     const rect = canvas.getBoundingClientRect();
@@ -311,6 +339,14 @@
     if (e.key.toLowerCase() === 's') selectedPlant = 'sunflower';
     if (e.key.toLowerCase() === 'p') selectedPlant = 'peashooter';
   });
+   const plantIcons = document.querySelectorAll('.plant-icon');
+plantIcons.forEach(icon => {
+  icon.addEventListener('click', () => {
+    plantIcons.forEach(i => i.classList.remove('selected'));
+    icon.classList.add('selected');
+    selectedPlant = icon.dataset.plant;
+  });
+});
 </script>
 </body>
 </html>
